@@ -17,10 +17,10 @@ app.use(express.static("public"));
 mongoose.connect("mongodb://localhost:27017/hospitalsDB", {useNewUrlParser:true})
 
 const psychiatristSchema= {
-    First_Name: String,
-    Last_Name: String,
-    Hospital_name: String,
-    phoneNumber: String,
+    First_Name: {type: String, required: true},
+    Last_Name: {type: String, required: true},
+    Hospital_name: {type: String, required: true},
+    phoneNumber:String,
     pinCode: String,
     State: String
   };
@@ -51,6 +51,9 @@ app.route("/psychiatrist")
         if(!err){
             res.send("successfully added new psychy to the db")
         }
+        else{
+            res.send(err);
+        }
     });
 })
 
@@ -69,25 +72,27 @@ app.route("/psychiatrist")
 app.route("/psychiatrist/:psychiatristName")
 
 .get(function(req,res){
-    Patient.findMany({psychiatristname: req.params.psychiatristName}, function(err,foundPatient){
-        if (foundPatient){
-            res.send(foundPatient);
+    Patient.find({})
+    .where("psychiatristName").equals(req.params.psychiatristName)
+    .exec(function(err,foundPatientList){
+        if(!err){
+            res.send(foundPatientList);
         }
         else{
-            res.send("Not found");
+            res.send(err);
         }
-    })
-})
+    });
+});
 
 //////////  For taking requests of patients    ////////////////
 
 const patientsSchema= {
-    Name: String,
-    Address: String,
-    email: String,
+    Name: {type:String, required:true},
+    Address: {type:String, required:true},
+    email: {type:String, required:true},
     phoneNumber:String,
-    pasword: String,
-    psychiatristname:String
+    pasword: {type:String, required:true},
+    psychiatristname:{type:String, required:true}
     // img: String
   };
   const Patient = mongoose.model("Patient", patientsSchema);

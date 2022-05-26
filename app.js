@@ -7,6 +7,10 @@ const mongoose = require('mongoose');
 
 const app = express();
 
+var validateEmail = function(email) {
+    var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    return re.test(email)
+};
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({
@@ -89,7 +93,15 @@ app.route("/psychiatrist/:psychiatristName")
 const patientsSchema= {
     Name: {type:String, required:true},
     Address: {type:String, required:true},
-    email: {type:String, required:true},
+    email: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        unique: true,
+        validate: [validateEmail, 'Please fill a valid email address'],
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
+        required:true
+    },
     phoneNumber:String,
     pasword: {type:String, required:true},
     psychiatristname:{type:String, required:true}
